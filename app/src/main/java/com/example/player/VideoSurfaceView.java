@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.*;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -67,25 +68,28 @@ public class VideoSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
             timer.schedule(new TimerTask() {
                 public void run() {
-                    if (!running)
-                        timer.cancel();
-                    Canvas canvas = surfaceHolder.lockCanvas();
-                    Paint paint = new Paint();
-                    try {
-                        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
-                        Bitmap bm = Bitmap.createBitmap(ExtractMpegFramesTest.list.getFirst(), x, y, width, height);
-                        //bm = Bitmap.createScaledBitmap(bm, (int) (width * ((float) metrics.widthPixels / (float) width)), (int) ((float) height * ((float) metrics.heightPixels / (float) height)), true);
-                        canvas.drawBitmap(bm, new Matrix(), paint);
-                        ExtractMpegFramesTest.list.removeFirst();
-                    } catch (NoSuchElementException e) {
-                        e.printStackTrace();
-                        if (end)
-                            running = false;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (running)
-                            surfaceHolder.unlockCanvasAndPost(canvas);
+                    synchronized (ExtractMpegFramesTest.list) {
+                        if (!running)
+                            timer.cancel();
+                        Canvas canvas = surfaceHolder.lockCanvas();
+                        Paint paint = new Paint();
+                        try {
+                            DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+                            //Log.e("Size", ExtractMpegFramesTest.list.size() + "");
+                            Bitmap bm = Bitmap.createBitmap(ExtractMpegFramesTest.list.getFirst(), x, y, width, height);
+                            bm = Bitmap.createScaledBitmap(bm, (int) (width * ((float) metrics.widthPixels / (float) width)), (int) ((float) height * ((float) metrics.heightPixels / (float) height)), true);
+                            canvas.drawBitmap(bm, new Matrix(), paint);
+                            ExtractMpegFramesTest.list.removeFirst();
+                        } catch (NoSuchElementException e) {
+                            e.printStackTrace();
+                            if (end)
+                                running = false;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            if (running)
+                                surfaceHolder.unlockCanvasAndPost(canvas);
+                        }
                     }
                 }
             }, 0, 33);
