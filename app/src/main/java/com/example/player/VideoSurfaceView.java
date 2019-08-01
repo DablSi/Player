@@ -74,7 +74,7 @@ public class VideoSurfaceView extends SurfaceView implements SurfaceHolder.Callb
                     try {
                         DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
                         Bitmap bm = Bitmap.createBitmap(ExtractMpegFramesTest.list.getFirst(), x, y, width, height);
-                        bm = Bitmap.createScaledBitmap(bm, (int) (width * ((float) metrics.widthPixels / (float) width)), (int) ((float) height * ((float) metrics.heightPixels / (float) height)), true);
+                        //bm = Bitmap.createScaledBitmap(bm, (int) (width * ((float) metrics.widthPixels / (float) width)), (int) ((float) height * ((float) metrics.heightPixels / (float) height)), true);
                         canvas.drawBitmap(bm, new Matrix(), paint);
                         ExtractMpegFramesTest.list.removeFirst();
                     } catch (NoSuchElementException e) {
