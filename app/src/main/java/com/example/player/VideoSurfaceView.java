@@ -92,7 +92,7 @@ public class VideoSurfaceView extends SurfaceView implements SurfaceHolder.Callb
                         }
                     }
                 }
-            }, 0, 33);
+            }, 0, 40);
         }
     }
 }
