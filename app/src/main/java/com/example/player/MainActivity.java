@@ -25,7 +25,8 @@ public class MainActivity extends AppCompatActivity {
         // get file
         ExtractMpegFramesTest test = new ExtractMpegFramesTest();
         try {
-            test.testExtractMpegFrames();
+            if (ExtractMpegFramesTest.list == null)
+                test.testExtractMpegFrames();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
