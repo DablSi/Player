@@ -31,8 +31,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 //20131122: minor tweaks to saveFrame() I/O
 //20131205: add alpha to EGLConfig (huge glReadPixels speedup); pre-allocate pixel buffers;
@@ -51,23 +50,23 @@ import java.util.Queue;
  */
 public class ExtractMpegFramesTest {
     private static final String TAG = "ExtractMpegFramesTest";
-    private static final boolean VERBOSE = true;           // lots of logging
+    private static final boolean VERBOSE = false;           // lots of logging
 
     // where to find files (note: requires WRITE_EXTERNAL_STORAGE permission)
     private static final File FILES_DIR = new File("/sdcard/Download");
     private static final String INPUT_FILE = "Screen.mp4";
     private static CodecOutputSurface outputSurface = null;
 
-    public static LinkedList<Bitmap> list;
+    public static List<Bitmap> list;
     //private static final int MAX_FRAMES = 100;       // stop extracting after this many
 
     /**
      * test entry point
      */
     public void testExtractMpegFrames() throws Throwable {
-        if(list != null)
+        if (list != null)
             list.clear();
-        list = new LinkedList<>();
+        list = Collections.synchronizedList(new LinkedList<Bitmap>());
         ExtractMpegFramesWrapper.runTest(this);
     }
 
@@ -212,7 +211,7 @@ public class ExtractMpegFramesTest {
         boolean outputDone = false;
         boolean inputDone = false;
         while (!outputDone) {
-            if(VideoSurfaceView.end)
+            if (VideoSurfaceView.end || list.size() >= 20)
                 continue;
             if (VERBOSE) Log.d(TAG, "loop");
 
@@ -565,14 +564,13 @@ public class ExtractMpegFramesTest {
             mPixelBuf.rewind();
             GLES20.glReadPixels(0, 0, mWidth, mHeight, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE,
                     mPixelBuf);
-            BufferedOutputStream bos = null;
             try {
                 Bitmap bmp = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
                 mPixelBuf.rewind();
                 bmp.copyPixelsFromBuffer(mPixelBuf);
                 list.add(bmp);
-            } finally {
-                if (bos != null) bos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             if (VERBOSE) {
                 Log.d(TAG, "Saved " + mWidth + "x" + mHeight + " frame");

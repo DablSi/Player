@@ -68,18 +68,18 @@ public class VideoSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
             timer.schedule(new TimerTask() {
                 public void run() {
-                    synchronized (ExtractMpegFramesTest.list) {
+                    if (ExtractMpegFramesTest.list.size() > 0) {
                         if (!running)
                             timer.cancel();
                         Canvas canvas = surfaceHolder.lockCanvas();
                         Paint paint = new Paint();
                         try {
                             DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
-                            //Log.e("Size", ExtractMpegFramesTest.list.size() + "");
-                            Bitmap bm = Bitmap.createBitmap(ExtractMpegFramesTest.list.getFirst(), x, y, width, height);
+                            Log.e("Size", ExtractMpegFramesTest.list.size() + "");
+                            Bitmap bm = Bitmap.createBitmap(ExtractMpegFramesTest.list.get(0), x, y, width, height);
                             bm = Bitmap.createScaledBitmap(bm, (int) (width * ((float) metrics.widthPixels / (float) width)), (int) ((float) height * ((float) metrics.heightPixels / (float) height)), true);
                             canvas.drawBitmap(bm, new Matrix(), paint);
-                            ExtractMpegFramesTest.list.removeFirst();
+                            ExtractMpegFramesTest.list.remove(0);
                         } catch (NoSuchElementException e) {
                             e.printStackTrace();
                             if (end)
